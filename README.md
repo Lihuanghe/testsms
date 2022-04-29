@@ -3,7 +3,7 @@
 
 # 命令行工具
 ```
-java -jar testsms-0.0.1-SNAPSHOT.jar -c "./cmpp.cfg" -sid cmpp -tel 18703815655  -txt  河北短信记录查询功能
+java -jar testsms-0.1.jar -c "./cmpp.cfg" -sid cmpp -tel 18703815655  -txt  河北短信记录查询功能
 
 usage: Options
  -attime <arg>   At_Time
