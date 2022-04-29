@@ -43,11 +43,11 @@ public class App {
 		Options options = new Options();
 		options.addOption("c", true, "config File");
 		options.addOption("h", false, "help info");
-		options.addOption("sid", true, "server id");
+		options.addOption("sid", true, "serverUrl id config File");
 		options.addOption("tel", true, "telephone");
 		options.addOption("txt", true, "SMS Content");
 		options.addOption("dcs", true, "msg-fmt");
-		options.addOption("attime", true, "At_Time");
+		options.addOption("attime", true, "At_Time . yyMMddhhmmsstnnp . 20220401150159032+");
 		options.addOption("wait", true, "wait time to exit");
 		options.addOption("spcode", true, "spcode");
 		options.addOption("msgsrc", true, "msgsrc");

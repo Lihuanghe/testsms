@@ -6,14 +6,14 @@
 java -jar testsms-0.1.jar -c "./cfg.cfg" -sid cmpp -tel 13800138000  -txt  河北短信记录查询功能
 
 usage: Options
- -attime <arg>   At_Time
+ -attime <arg>   At_Time . yyMMddhhmmsstnnp . 20220401150159032+
  -c <arg>        config File
  -dcs <arg>      msg-fmt
  -h              help info
  -msgsrc <arg>   msgsrc
  -raw <arg>      send raw splited hex user-data , encode : dcs,ud,dcs,ud.
                  ex. 8,0500037702016cb3531777......
- -sid <arg>      server id in config File
+ -sid <arg>      serverUrl id config File
  -spcode <arg>   spcode
  -tel <arg>      telephone
  -txt <arg>      SMS Content
