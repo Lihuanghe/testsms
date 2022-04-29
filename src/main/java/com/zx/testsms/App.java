@@ -6,7 +6,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -14,9 +16,10 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
+import org.marre.sms.SmppSmsDcs;
 import org.marre.sms.SmsDcs;
-import org.marre.sms.SmsTextMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,11 +27,10 @@ import com.chinamobile.cmos.MessageReceiver;
 import com.chinamobile.cmos.SmsClient;
 import com.chinamobile.cmos.SmsClientBuilder;
 import com.zx.sms.BaseMessage;
-import com.zx.sms.codec.cmpp.msg.CmppSubmitRequestMessage;
+import com.zx.sms.LongSMSMessage;
+import com.zx.sms.codec.cmpp.wap.LongMessageFrame;
 import com.zx.sms.connect.manager.EndpointEntity;
 import com.zx.sms.connect.manager.EndpointEntity.ChannelType;
-import com.zx.sms.connect.manager.cmpp.CMPPClientEndpointEntity;
-import com.zx.sms.connect.manager.smpp.SMPPClientEndpointEntity;
 
 /**
  * Hello world!
@@ -40,15 +42,17 @@ public class App {
 	public static void main(String[] args) {
 		Options options = new Options();
 		options.addOption("c", true, "config File");
-		options.addOption("h",  false, "help info");
+		options.addOption("h", false, "help info");
 		options.addOption("sid", true, "server id");
-		options.addOption("tel",  true, "telephone");
-		options.addOption("txt",  true, "SMS Content");
-		options.addOption("dcs",  true, "msg-fmt");
+		options.addOption("tel", true, "telephone");
+		options.addOption("txt", true, "SMS Content");
+		options.addOption("dcs", true, "msg-fmt");
 		options.addOption("attime", true, "At_Time");
 		options.addOption("wait", true, "wait time to exit");
-		options.addOption("spcode",  true, "spcode");
+		options.addOption("spcode", true, "spcode");
 		options.addOption("msgsrc", true, "msgsrc");
+		options.addOption("raw", true,
+				"send  raw splited hex user-data , encode : dcs,ud,dcs,ud.  ex. 8,0500037702016cb3531777......");
 		CommandLine line;
 		try {
 			line = new DefaultParser().parse(options, args);
@@ -78,9 +82,9 @@ public class App {
 				processor = new SmppProtocolProcessor();
 			} else if ("sgip".equalsIgnoreCase(protocol)) {
 				processor = new SgipProtocolProcessor();
-			} else if("smgp".equalsIgnoreCase(protocol)) {
+			} else if ("smgp".equalsIgnoreCase(protocol)) {
 				processor = new SMGPProtocolProcessor();
-			} 
+			}
 
 			EndpointEntity client = processor.buildClient(queryMap);
 			String proxy = queryMap.get("proxy");
@@ -98,11 +102,54 @@ public class App {
 					.receiver(new MessageReceiver() {
 
 						public void receive(BaseMessage message) {
-							logger.info("receive : {}", message.toString());
+//							logger.info("receive : {}", message.toString());
 						}
 					}).build();
-			BaseMessage msg = processor.buildMsg(line.getOptionValue("tel"), line.getOptionValue("txt"), line,queryMap);
-			BaseMessage response = smsClient.send(msg);
+			BaseMessage msg = processor.buildMsg(line.getOptionValue("tel"), line.getOptionValue("txt"), line,
+					queryMap);
+
+			if (line.hasOption("raw")) {
+				String userDatas = line.getOptionValue("raw");
+				if (StringUtils.isNoneBlank(userDatas)) {
+					String[] b_ud = userDatas.split(",");
+					List<LongMessageFrame> frames = new ArrayList<LongMessageFrame>();
+
+					if (b_ud.length > 0 && b_ud.length % 2 != 0) {
+						logger.error("raw user data length is odd ,must be even and greate than zero. ");
+						return;
+					}
+
+					for (int i = 0; i < b_ud.length; i += 2) {
+						String dcs = b_ud[i];
+						String smsContent = b_ud[i + 1];
+						byte[] b_smsContent = Hex.decodeHex(smsContent.toCharArray());
+						LongMessageFrame frame = new LongMessageFrame();
+						frame.setPkseq((byte) 0x54);
+						frame.setPktotal((byte) (b_ud.length / 2));
+						frame.setPknumber((byte) (i / 2 + 1));
+						if ("smpp".equalsIgnoreCase(protocol)) {
+							frame.setMsgfmt(new SmppSmsDcs(Byte.valueOf(dcs)));
+						} else {
+							frame.setMsgfmt(new SmsDcs(Byte.valueOf(dcs)));
+						}
+						frame.setTpudhi(b_ud.length > 2 ? (short) 1 : (short) 0);
+						frame.setMsgLength((short) b_smsContent.length);
+						frame.setMsgContentBytes(b_smsContent);
+						frames.add(frame);
+					}
+
+					List<BaseMessage> msgs = new ArrayList<BaseMessage>();
+					for (LongMessageFrame frame : frames) {
+						BaseMessage basemsg = ((LongSMSMessage<BaseMessage>) msg).generateMessage(frame);
+						BaseMessage response = smsClient.sendRawMsg(basemsg);
+					}
+
+				} else {
+					logger.error("raw user data is empty.");
+				}
+			} else {
+				BaseMessage response = smsClient.send(msg);
+			}
 
 			String wait = line.getOptionValue("wait", "3000");
 			Thread.sleep(Integer.valueOf(wait));
@@ -137,7 +184,7 @@ public class App {
 
 	private static Properties loadProperties(String resources) throws FileNotFoundException {
 		InputStream inputstream = new FileInputStream(new File(resources));
-		
+
 		try {
 			Properties properties = new Properties();
 

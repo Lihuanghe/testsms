@@ -3,7 +3,7 @@
 
 # 命令行工具
 ```
-java -jar testsms-0.1.jar -c "./cmpp.cfg" -sid cmpp -tel 18703815655  -txt  河北短信记录查询功能
+java -jar testsms-0.1.jar -c "./cfg.cfg" -sid cmpp -tel 13800138000  -txt  河北短信记录查询功能
 
 usage: Options
  -attime <arg>   At_Time
@@ -11,6 +11,8 @@ usage: Options
  -dcs <arg>      msg-fmt
  -h              help info
  -msgsrc <arg>   msgsrc
+ -raw <arg>      send raw splited hex user-data , encode : dcs,ud,dcs,ud.
+                 ex. 8,0500037702016cb3531777......
  -sid <arg>      server id in config File
  -spcode <arg>   spcode
  -tel <arg>      telephone
@@ -29,4 +31,9 @@ sgip=sgip://127.0.0.1:16890?username=test01&password=1qaz2wsx&nodeid=322323&spco
 
 smgp=smgp://127.0.0.1:19890?username=test01&password=1qaz2wsx&version=48&serviceid=322323&spcode=10086&msgsrc=901783
 
+# 发送二进制短信内容
+```
 
+java -jar testsms-0.1.jar -c "./cfg.cfg" -sid cmpp -tel 13800138000 -raw 0,05000310020144454c4956524432323034,8,0500031002026cb3531777ed4fe18bb0
+
+```
