@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -47,10 +48,11 @@ public class App {
 		options.addOption("tel", true, "telephone");
 		options.addOption("txt", true, "SMS Content");
 		options.addOption("dcs", true, "msg-fmt");
-		options.addOption("attime", true, "At_Time . yyMMddhhmmsstnnp . 20220401150159032+");
+		options.addOption("attime", true, "At_Time . yyMMddhhmmsstnnp . 220401150159032+");
 		options.addOption("wait", true, "wait time to exit");
 		options.addOption("spcode", true, "spcode");
 		options.addOption("msgsrc", true, "msgsrc");
+		options.addOption("pid", true, "pid");
 		options.addOption("raw", true,
 				"send  raw splited hex user-data , encode : dcs,ud,dcs,ud.  ex. 8,0500037702016cb3531777......");
 		CommandLine line;
@@ -95,7 +97,7 @@ public class App {
 			client.setChannelType(ChannelType.DUPLEX);
 			client.setMaxChannels((short) 1);
 			client.setProxy(proxy);
-
+			BeanUtils.copyProperties(client, queryMap);
 			SmsClientBuilder builder = new SmsClientBuilder();
 			final SmsClient smsClient = builder.entity(client).keepAllIdleConnection() // 保持空闲连接，以便能接收上行或者状态报告消息
 					.window(32) // 设置发送窗口

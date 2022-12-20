@@ -53,7 +53,13 @@ public class SmppProtocolProcessor implements ProtocolProcessor {
 		String attime = line.getOptionValue("attime");
 		if (StringUtils.isNotBlank(attime)) {
 			pdu.setScheduleDeliveryTime(attime);
+			pdu.setValidityPeriod(attime);
 		}
+		
+        String pid = line.getOptionValue("pid");
+        if(StringUtils.isNotBlank(pid)) {
+        	pdu.setProtocolId((byte)Integer.parseInt(pid));
+       }
 
 		pdu.setDestAddress(new Address(ton, npi, telephone));
 

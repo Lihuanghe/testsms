@@ -68,6 +68,11 @@ public class CmppProtocolProcessor implements ProtocolProcessor {
 	        if(StringUtils.isNotBlank(msgsrc)) {
 	        	msg.setMsgsrc(msgsrc);
 	       }
+	        
+	        String pid = line.getOptionValue("pid");
+	        if(StringUtils.isNotBlank(pid)) {
+	        	msg.setTppid((short)Integer.parseInt(pid));
+	       }
 	        return msg;
 	    }
 
