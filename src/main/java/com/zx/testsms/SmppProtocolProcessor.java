@@ -4,11 +4,12 @@ import java.util.Map;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.lang3.StringUtils;
-import org.marre.sms.SmppSmsDcs;
-import org.marre.sms.SmsTextMessage;
 
+import com.chinamobile.cmos.sms.SmppSmsDcs;
+import com.chinamobile.cmos.sms.SmsTextMessage;
 import com.zx.sms.BaseMessage;
 import com.zx.sms.codec.smpp.Address;
+import com.zx.sms.codec.smpp.SmppSplitType;
 import com.zx.sms.codec.smpp.msg.SubmitSm;
 import com.zx.sms.connect.manager.EndpointEntity;
 import com.zx.sms.connect.manager.smpp.SMPPClientEndpointEntity;
@@ -74,9 +75,11 @@ public class SmppProtocolProcessor implements ProtocolProcessor {
 		String version = queryMap.get("version");
 		String servicetype = queryMap.get("servicetype");
 		String addzero = queryMap.get("addzero");
+		String splittype =  queryMap.get("splittype");
 		client.setSystemId(userName);
 		client.setPassword(pass);
 		client.setInterfaceVersion(Integer.valueOf(version).byteValue());
+		client.setSplitType(SmppSplitType.valueOf(splittype));
 		if (StringUtils.isNoneBlank(servicetype))
 			client.setSystemType(servicetype);
 

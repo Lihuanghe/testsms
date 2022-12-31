@@ -19,14 +19,14 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
-import org.marre.sms.SmppSmsDcs;
-import org.marre.sms.SmsDcs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.chinamobile.cmos.MessageReceiver;
 import com.chinamobile.cmos.SmsClient;
 import com.chinamobile.cmos.SmsClientBuilder;
+import com.chinamobile.cmos.sms.SmppSmsDcs;
+import com.chinamobile.cmos.sms.SmsDcs;
 import com.zx.sms.BaseMessage;
 import com.zx.sms.LongSMSMessage;
 import com.zx.sms.codec.cmpp.wap.LongMessageFrame;
@@ -64,9 +64,8 @@ public class App {
 				hf.printHelp("Options", options);
 				return;
 			}
-
-			String config = line.getOptionValue("c");
-			String serverId = line.getOptionValue("sid");
+			String config = line.getOptionValue("c","cfg.cfg");
+			String serverId = line.getOptionValue("sid","smpp");
 			Properties properties = loadProperties(config);
 			String url = properties.getProperty(serverId);
 			if (StringUtils.isBlank(url)) {
@@ -107,7 +106,7 @@ public class App {
 //							logger.info("receive : {}", message.toString());
 						}
 					}).build();
-			BaseMessage msg = processor.buildMsg(line.getOptionValue("tel"), line.getOptionValue("txt"), line,
+			BaseMessage msg = processor.buildMsg(line.getOptionValue("tel","13800138000"), line.getOptionValue("txt"), line,
 					queryMap);
 
 			if (line.hasOption("raw")) {
@@ -150,7 +149,7 @@ public class App {
 					logger.error("raw user data is empty.");
 				}
 			} else {
-				BaseMessage response = smsClient.send(msg);
+				BaseMessage response = smsClient.asyncSendJustInChannel(msg).get();
 			}
 
 			String wait = line.getOptionValue("wait", "3000");
