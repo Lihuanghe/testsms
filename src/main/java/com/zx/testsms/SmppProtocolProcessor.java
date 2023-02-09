@@ -6,7 +6,10 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.lang3.StringUtils;
 
 import com.chinamobile.cmos.sms.SmppSmsDcs;
+import com.chinamobile.cmos.sms.SmsMessage;
 import com.chinamobile.cmos.sms.SmsTextMessage;
+import com.chinamobile.cmos.wap.push.SmsWapPushMessage;
+import com.chinamobile.cmos.wap.push.WapSLPush;
 import com.zx.sms.BaseMessage;
 import com.zx.sms.codec.smpp.Address;
 import com.zx.sms.codec.smpp.SmppSplitType;
@@ -30,6 +33,13 @@ public class SmppProtocolProcessor implements ProtocolProcessor {
 		} else {
 			pdu.setSmsMsg(new SmsTextMessage(content, new SmppSmsDcs(Byte.valueOf(dcs))));
 		}
+		
+		if(line.hasOption("wap")) {
+			WapSLPush sl = new WapSLPush(content);
+			SmsMessage wap = new SmsWapPushMessage(sl);
+			pdu.setSmsMsg(wap);
+		}
+		
 		byte ton = 2;
 		byte npi = 1;
 		if (StringUtils.isNotBlank(queryMap.get("ton"))) {
@@ -79,7 +89,8 @@ public class SmppProtocolProcessor implements ProtocolProcessor {
 		client.setSystemId(userName);
 		client.setPassword(pass);
 		client.setInterfaceVersion(Integer.valueOf(version).byteValue());
-		client.setSplitType(SmppSplitType.valueOf(splittype));
+		if(StringUtils.isNotBlank(splittype))
+				client.setSplitType(SmppSplitType.valueOf(splittype));
 		if (StringUtils.isNoneBlank(servicetype))
 			client.setSystemType(servicetype);
 

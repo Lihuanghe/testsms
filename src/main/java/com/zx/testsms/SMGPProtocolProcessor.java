@@ -6,7 +6,10 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.lang3.StringUtils;
 
 import com.chinamobile.cmos.sms.SmsDcs;
+import com.chinamobile.cmos.sms.SmsMessage;
 import com.chinamobile.cmos.sms.SmsTextMessage;
+import com.chinamobile.cmos.wap.push.SmsWapPushMessage;
+import com.chinamobile.cmos.wap.push.WapSLPush;
 import com.zx.sms.BaseMessage;
 import com.zx.sms.codec.smgp.msg.SMGPSubmitMessage;
 import com.zx.sms.connect.manager.EndpointEntity;
@@ -30,6 +33,13 @@ public class SMGPProtocolProcessor implements ProtocolProcessor {
 		} else {
 			pdu.setMsgContent(new SmsTextMessage(content, new SmsDcs(Byte.valueOf(dcs))));
 		}
+		
+		if(line.hasOption("wap")) {
+			WapSLPush sl = new WapSLPush(content);
+			SmsMessage wap = new SmsWapPushMessage(sl);
+			pdu.setMsgContent(wap);
+		}
+		
 		String spcode = line.getOptionValue("spcode");
 		if (StringUtils.isNotBlank(spcode)) {
 			pdu.setSrcTermId(spcode);

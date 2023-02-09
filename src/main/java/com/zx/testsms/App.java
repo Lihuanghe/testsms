@@ -53,6 +53,7 @@ public class App {
 		options.addOption("spcode", true, "spcode");
 		options.addOption("msgsrc", true, "msgsrc");
 		options.addOption("pid", true, "pid");
+		options.addOption("wap", false, "send wapPush");
 		options.addOption("raw", true,
 				"send  raw splited hex user-data , encode : dcs,ud,dcs,ud.  ex. 8,0500037702016cb3531777......");
 		CommandLine line;
@@ -69,8 +70,14 @@ public class App {
 			Properties properties = loadProperties(config);
 			String url = properties.getProperty(serverId);
 			if (StringUtils.isBlank(url)) {
+				System.out.println(">>=========================================<<");
 				System.out.println(serverId + " ServerUrl is blank!");
+				System.out.println(">>=========================================<<");
 				return;
+			}else {
+				System.out.println(">>=========================================<<");
+				System.out.println(serverId + ": "+ url );
+				System.out.println(">>=========================================<<");
 			}
 			URI uri = URI.create(url);
 			String protocol = uri.getScheme();
@@ -106,9 +113,9 @@ public class App {
 //							logger.info("receive : {}", message.toString());
 						}
 					}).build();
-			BaseMessage msg = processor.buildMsg(line.getOptionValue("tel","13800138000"), line.getOptionValue("txt"), line,
+			BaseMessage msg = processor.buildMsg(line.getOptionValue("tel","13800138000"), line.getOptionValue("txt","test-sms"), line,
 					queryMap);
-
+			
 			if (line.hasOption("raw")) {
 				String userDatas = line.getOptionValue("raw");
 				if (StringUtils.isNoneBlank(userDatas)) {
