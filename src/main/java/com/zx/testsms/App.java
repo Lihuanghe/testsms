@@ -5,7 +5,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -83,7 +85,7 @@ public class App {
 			String protocol = uri.getScheme();
 
 			ProtocolProcessor processor = null;
-			Map<String, String> queryMap = queryToMap(uri.getQuery());
+			Map<String, String> queryMap = queryToMap(uri.getRawQuery());
 			if ("cmpp".equalsIgnoreCase(protocol)) {
 				processor = new CmppProtocolProcessor();
 			} else if ("smpp".equalsIgnoreCase(protocol)) {
@@ -162,8 +164,6 @@ public class App {
 			String wait = line.getOptionValue("wait", "3000");
 			Thread.sleep(Integer.valueOf(wait));
 			smsClient.close();
-			Thread.sleep(Integer.valueOf(wait));
-
 			logger.info("exit");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -181,7 +181,12 @@ public class App {
 					continue;
 				String[] kv = pairs.split("=");
 				if (kv.length > 1) {
-					result.put(kv[0], kv[1]);
+					try {
+						result.put(kv[0], URLDecoder.decode(kv[1], "UTF-8"));
+					} catch (UnsupportedEncodingException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				} else {
 					result.put(kv[0], "");
 				}

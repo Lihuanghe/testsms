@@ -6,10 +6,7 @@ import org.apache.commons.beanutils.BeanMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.zx.sms.connect.manager.EndpointEntity;
 import com.zx.sms.connect.manager.cmpp.CMPPClientEndpointEntity;
-import com.zx.sms.connect.manager.sgip.SgipClientEndpointEntity;
-import com.zx.sms.connect.manager.smgp.SMGPClientEndpointEntity;
 import com.zx.sms.connect.manager.smpp.SMPPClientEndpointEntity;
 
 import junit.framework.Test;
