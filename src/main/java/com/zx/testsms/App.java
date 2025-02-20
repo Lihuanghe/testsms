@@ -158,7 +158,7 @@ public class App {
 					logger.error("raw user data is empty.");
 				}
 			} else {
-				BaseMessage response = smsClient.asyncSendJustInChannel(msg).get();
+				BaseMessage response = smsClient.send(msg);
 			}
 
 			String wait = line.getOptionValue("wait", "3000");

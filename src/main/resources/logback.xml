@@ -9,7 +9,7 @@
 		</encoder>
 	</appender>
     <logger name="entity" >
-		<level value= "trace" />
+		<level value= "debug" />
 	</logger>
 	<logger name="com.zx" >
 		<level value= "debug" />
