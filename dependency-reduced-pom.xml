@@ -4,7 +4,7 @@
   <groupId>com.zx</groupId>
   <artifactId>testsms</artifactId>
   <name>testsms</name>
-  <version>0.1</version>
+  <version>0.2</version>
   <url>http://maven.apache.org</url>
   <build>
     <plugins>
